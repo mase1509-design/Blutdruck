@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blutdruck App</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" sizes="180x180" href="icon-180x180.png">
+</head>
+<body class="bg-gray-100 p-4">
+  <h1 class="text-2xl font-bold mb-4 text-center">Blutdruck Werte</h1>
+
+  <form id="form" class="bg-white p-4 rounded shadow max-w-md mx-auto space-y-3">
+    <div>
+      <label class="block">Datum</label>
+      <input id="date" type="date" class="w-full border rounded px-2 py-1" required>
+    </div>
+    <div>
+      <label class="block">Oberer Blutdruck</label>
+      <input id="sys" type="number" min="0" max="999" class="w-full border rounded px-2 py-1" required>
+    </div>
+    <div>
+      <label class="block">Unterer Blutdruck</label>
+      <input id="dia" type="number" min="0" max="999" class="w-full border rounded px-2 py-1" required>
+    </div>
+    <div>
+      <label class="block">Puls</label>
+      <input id="pulse" type="number" min="0" max="999" class="w-full border rounded px-2 py-1" required>
+    </div>
+    <button class="w-full bg-green-500 text-white py-2 rounded">Speichern</button>
+    <button type="button" id="csv" class="w-full bg-blue-500 text-white py-2 rounded">CSV exportieren</button>
+  </form>
+
+  <table class="table-auto w-full max-w-md mx-auto mt-6 bg-white shadow rounded">
+    <thead class="bg-gray-200">
+      <tr>
+        <th class="p-2">Datum</th>
+        <th class="p-2">Oberer</th>
+        <th class="p-2">Unterer</th>
+        <th class="p-2">Puls</th>
+      </tr>
+    </thead>
+    <tbody id="table"></tbody>
+  </table>
+
+<script src="app.js"></script>
+</body>
+</html>

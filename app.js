@@ -9,38 +9,50 @@ const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
 let tokenClient;
 let gapiInited = false;
+let gisInited = false;
 
 document.getElementById("date").valueAsDate = new Date();
 
-function gapiLoaded() {
-  gapi.load("client", initializeGapiClient);
-}
-
-async function initializeGapiClient() {
-  await gapi.client.init({
-    apiKey: API_KEY,
-    discoveryDocs: [DISCOVERY_DOC],
+// ---------- Google API laden ----------
+window.onload = () => {
+  gapi.load("client", async () => {
+    await gapi.client.init({
+      apiKey: API_KEY,
+      discoveryDocs: [DISCOVERY_DOC],
+    });
+    gapiInited = true;
   });
-  gapiInited = true;
-}
 
-function gisLoaded() {
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
     scope: SCOPES,
-    callback: '',
+    callback: "",
   });
-}
 
+  gisInited = true;
+};
+
+// ---------- Login Button ----------
 document.getElementById("loginBtn").onclick = () => {
+  if (!gapiInited || !gisInited) {
+    alert("Google API lädt noch… bitte 2 Sekunden warten.");
+    return;
+  }
+
   tokenClient.callback = async (resp) => {
-    if (resp.error !== undefined) throw resp;
+    if (resp.error) {
+      console.error(resp);
+      return;
+    }
+
     document.getElementById("form").classList.remove("hidden");
     loadSheet();
   };
+
   tokenClient.requestAccessToken({ prompt: "consent" });
 };
 
+// ---------- Spreadsheet laden ----------
 async function loadSheet() {
   const res = await gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
@@ -55,13 +67,14 @@ async function loadSheet() {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td class="p-2">${r[0]}</td>
-      <td class="p-2 ${r[1]>135?'bg-red-200':''}">${r[1]}</td>
-      <td class="p-2 ${r[2]>90?'bg-red-200':''}">${r[2]}</td>
+      <td class="p-2 ${r[1] > 135 ? "bg-red-200" : ""}">${r[1]}</td>
+      <td class="p-2 ${r[2] > 90 ? "bg-red-200" : ""}">${r[2]}</td>
       <td class="p-2">${r[3]}</td>`;
     table.appendChild(tr);
   });
 }
 
+// ---------- Speichern ----------
 document.getElementById("form").addEventListener("submit", async e => {
   e.preventDefault();
 
@@ -83,6 +96,3 @@ document.getElementById("form").addEventListener("submit", async e => {
   e.target.reset();
   document.getElementById("date").valueAsDate = new Date();
 });
-
-gapiLoaded();
-gisLoaded();
